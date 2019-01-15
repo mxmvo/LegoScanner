@@ -8,8 +8,8 @@ DEVICES_CONFIG = {
     'sensors':{
         'bot': ('large_motor', 'outA'),
         'top': ('large_motor', 'outB'),
-        'ts1': ('touch_sensor', 'in1'),
-        'ts2': ('touch_sensor', 'in2'),
+        #'ts1': ('touch_sensor', 'in1'),
+        #'ts2': ('touch_sensor', 'in2'),
         'cs': ('color_sensor', 'in4')
     },
     'actionables':{
