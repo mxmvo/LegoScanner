@@ -55,7 +55,9 @@ class Environment:
         for actionable in self.devices['actionables'].values():
             actionable.perform_reset_action()
 
-    def disconnect(self):
+    def disconnect(self, stop=True):
+        if stop:
+            self.stop()
         del(self.LC)
 
 class EnvSensor:
