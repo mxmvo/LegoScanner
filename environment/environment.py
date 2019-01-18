@@ -1,84 +1,51 @@
-import numpy as np
-from .lego_connector import LegoConnector
-from .devices import Device
-from .config import ENVIRONMENT_CONFIG, DEVICES_CONFIG, OBJECTS_CONFIG, SENSORS_CONFIG, ACTIONABLES_CONFIG
+'''
+Make an environment class that uses the system class
 
-class Environment:
-    def __init__(self, brick_ip='ev3dev.local', get_state_mode=None):
+To be similar as Open AI gym me make functions
 
-        if get_state_mode is None: # fallback to default if not specified
-            self.get_state_mode = ENVIRONMENT_CONFIG.get_state_mode
-        else:
-            self.get_state_mode = get_state_mode
+env.make('env_string'):
+    - This initialises the environment and returns the environment object
+    (so this deviates a bit from the gym idea where the make in not a function of the environment)
 
-        self.LC = LegoConnector(brick_ip)
+env.reset():
+    - This should reset the environment to the initial state
+    and outputs the initial state
 
-        devices = {}
-        for key in DEVICES_CONFIG.keys():
-            # fetch devices from the LEGO interface
-            devices[key] = {name: self.LC.get_device(conf[0], conf[1]) for (name, conf) in DEVICES_CONFIG[key].items()}
-            
-            # wrap them in Env abstraction to expose get_state and perform_action
-            devices[key] = {name: eval(OBJECTS_CONFIG[key])(device) for (name, device) in devices[key].items()}
+env.step(a)
+    - Perform action a
+    - Return new_state, reward, whether we are done, some dictionairy we never actually seem to use
 
-        self.devices = devices
+'''
+from environment.system import System
 
-    def get_state(self):
-        # the get_state() method is defined in each of the EnvSensor objects
-        return {
-            'list': [device.get_state() for device in self.devices['sensors'].values()],
-            'dict': {name: device.get_state() for (name, device) in self.devices['sensors'].items()}
-        }[self.get_state_mode]
 
-    def perform_actions(self, actions):
-        if type(actions) == list:
-            for actionable, action in zip(self.devices['actionables'].values(), actions):
-                actionable.perform_action(action)
-        elif type(actions) == dict:
-            for key, action in actions.items():
-                self.devices['actionables'][key].perform_action(action)
-        else:
-            raise ValueError('Actions have to be of type list or dict. Provided:', type(actions))
 
-    def get_action_space(self, mode='list'):
-        # mode: 'list' or 'dict'
-        return {
-            'list': [actionable.possible_actions for actionable in self.devices['actionables'].values()],
-            'dict': {name: actionable.possible_actions for (name, actionable) in self.devices['actionables'].items()}
-        }[mode]
-
-    def stop(self):
-        for actionable in self.devices['actionables'].values():
-            actionable.perform_stop_action()
+class environment():
+    def __init__(self, ):
+        env = System(brick_ip='ev3dev.local', get_state_mode='dict')
+        env.get_state()
+        env.get_action_space()
 
     def reset(self):
-        for actionable in self.devices['actionables'].values():
-            actionable.perform_reset_action()
+        # stop current action
 
-    def disconnect(self, stop=True):
-        if stop:
-            self.stop()
-        del(self.LC)
+        # Go to initial state
 
-class EnvSensor:
-    def __init__(self, device_object):
-        assert isinstance(device_object, Device)
+        # return state
+        return None
 
-        self.sensor = device_object.object
-        self.relevant_fields = SENSORS_CONFIG[device_object.type]
+    def step(self, action):
+        # give the action to the motors
 
-    def get_state(self):
-        return tuple(getattr(self.sensor, field) for field in self.relevant_fields)
+        # run for 1 sec
+        # while 1 sec
+        # - measure color 5/10 times
+        # - check saying whether in the field (using classifier)
+        # - if not in field do somehting
+        
 
-class EnvActionable:
-    def __init__(self, device_object):
-        assert type(device_object) is Device
 
-        self.actionable_object = ACTIONABLES_CONFIG[device_object.type][0](device_object)
-        self.possible_actions = ACTIONABLES_CONFIG[device_object.type][1]
+        # set the speeds to zero or not
+        return None
 
-        self.perform_stop_action = self.actionable_object.stop_action_function
-        self.perform_reset_action = self.actionable_object.reset_action_function
-
-    def perform_action(self, action_number):
-        self.actionable_object.action_function(self.possible_actions[action_number])
+    
