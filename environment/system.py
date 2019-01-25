@@ -64,8 +64,14 @@ class System:
 
     def go_to_init_state(self):
         # This is a hack and shouldn't be like this. Since the motor shoudl be available even when they are note sensors
-        self.devices['sensors']['bot'].sensor.run_to_abs_pos(position_sp = self.init_pos['bot'])
-        self.devices['sensors']['top'].sensor.run_to_abs_pos(position_sp = self.init_pos['top'])
+        self.devices['actionables']['bot'].actionable_object.motor.run_to_abs_pos(position_sp = self.init_pos['bot'], speed_sp = 100)
+        self.devices['actionables']['top'].actionable_object.motor.run_to_abs_pos(position_sp = self.init_pos['top'], speed_sp = 100)
+
+        while self.devices['actionables']['top'].actionable_object.motor.is_running or self.devices['actionables']['bot'].actionable_object.motor.is_running:
+            pass
+
+        self.devices['actionables']['bot'].actionable_object.motor.run_direct(duty_cycle_sp = 0)
+        self.devices['actionables']['top'].actionable_object.motor.run_direct(duty_cycle_sp = 0)
 
     def disconnect(self, stop=True):
         if stop:
