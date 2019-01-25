@@ -26,6 +26,8 @@ class System:
 
             #for name in devices[key].keys():
             #    devices[key][name] = eval(OBJECTS_CONFIG[key])(devices[key][name])
+
+        print(devices)
             
         self.devices = devices
 
