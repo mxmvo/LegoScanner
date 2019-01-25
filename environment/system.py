@@ -13,6 +13,8 @@ class System:
 
         self.LC = LegoConnector(brick_ip)
 
+        self.init_pos = {'bot': 0, 'top': 0 }
+
         devices = {}
         for key in DEVICES_CONFIG.keys():
             # fetch devices from the LEGO interface
@@ -54,6 +56,11 @@ class System:
     def reset(self):
         for actionable in self.devices['actionables'].values():
             actionable.perform_reset_action()
+
+    def go_to_init_state(self):
+        # This is a hack and shouldn't be like this. Since the motor shoudl be available even when they are note sensors
+        self.devices['sensors']['bot'].sensor.run_to_abs_pos(position_sp = self.init_pos['bot'])
+        self.devices['sensors']['top'].sensor.run_to_abs_pos(position_sp = self.init_pos['top'])
 
     def disconnect(self, stop=True):
         if stop:
