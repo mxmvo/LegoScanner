@@ -32,7 +32,7 @@ SENSORS_CONFIG = {
 
 ACTIONABLES_CONFIG = {
     #'tank_motor': (lambda device_object: TankMotor(device_object), [(-2,-2), (2,2), (-3,3), (3,-3)], (0,0)),
-    'large_motor': (lambda device_object: LargeMotor(device_object), [-20,-10,10,20], 0),
+    'large_motor': (lambda device_object: LargeMotor(device_object), [-14, -12, -10, -8, 8, 10, 12, 14], 0),
     #'large_motor.bot': (lambda device_object: LargeMotor(device_object), [-20,-10,10,20], (0,0))
 
 }
