@@ -1,4 +1,4 @@
-from .devices import TankMotor
+from .devices import TankMotor, LargeMotor
 
 ENVIRONMENT_CONFIG = {
     'get_state_mode': 'dict' # list or dict
@@ -13,7 +13,9 @@ DEVICES_CONFIG = {
         'cs': ('color_sensor', 'in4')
     },
     'actionables':{
-        'tm': ('tank_motor', ('outA', 'outB'))
+        #'tm': ('tank_motor', ('outA', 'outB'))
+        'bot': ('large_motor', 'outA'),
+        'top': ('large_motor', 'outB')
     }
 }
 
@@ -29,5 +31,8 @@ SENSORS_CONFIG = {
 }
 
 ACTIONABLES_CONFIG = {
-    'tank_motor': (lambda device_object: TankMotor(device_object), [(-2,-2), (2,2), (-3,3), (3,-3)], (0,0))
+    #'tank_motor': (lambda device_object: TankMotor(device_object), [(-2,-2), (2,2), (-3,3), (3,-3)], (0,0)),
+    'large_motor': (lambda device_object: LargeMotor(device_object), [-20,-10,10,20], 0),
+    #'large_motor.bot': (lambda device_object: LargeMotor(device_object), [-20,-10,10,20], (0,0))
+
 }

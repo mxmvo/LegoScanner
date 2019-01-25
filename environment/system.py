@@ -19,11 +19,16 @@ class System:
         for key in DEVICES_CONFIG.keys():
             # fetch devices from the LEGO interface
             devices[key] = {name: self.LC.get_device(conf[0], conf[1]) for (name, conf) in DEVICES_CONFIG[key].items()}
-            
             # wrap them in Env abstraction to expose get_state and perform_action
-            devices[key] = {name: eval(OBJECTS_CONFIG[key])(device) for (name, device) in devices[key].items()}
 
+            for (name, device) in devices[key].items():
+                devices[key][name] = eval(OBJECTS_CONFIG[key])(device)
+
+            #for name in devices[key].keys():
+            #    devices[key][name] = eval(OBJECTS_CONFIG[key])(devices[key][name])
+            
         self.devices = devices
+
 
     def get_state(self):
         # the get_state() method is defined in each of the EnvSensor objects
