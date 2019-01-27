@@ -38,5 +38,6 @@ ACTIONABLES_CONFIG = {
 }
 
 ENVIRONMENT_CONFIG ={
-    'free_cycle' : 5
+    'free_cycle' : 5,
+    'bouncing' : False
 }

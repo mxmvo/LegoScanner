@@ -22,6 +22,7 @@ class Environment():
     get_state_function : func
         Function that has a queue as input (containing angles and color) and outputs the wanted state
     '''
+
     def __init__(self, field_classifier, reward_classifier, get_reward_function, get_state_function, state_queue_len=10):
         self.system = System(brick_ip='ev3dev.local', get_state_mode='dict')
         self.field_classifier = utils.load_pickle(field_classifier)
@@ -70,11 +71,17 @@ class Environment():
             print('I am outside')
             self.border_count += 1
 
-            if self.on_field:
-                self.system.perform_actions([self.opposite_action[a] for a in self.current_action])
-                print('BOUNCIN!!1')
-                time.sleep(1)
+            if ENVIRONMENT_CONFIG['bouncing']:
+                if self.on_field:
+                    self.system.perform_actions([self.opposite_action[a] for a in self.current_action])
+                    print('BOUNCIN!!1')
+                    time.sleep(1)
+
+            else:
+                self.go_to_unit_state()
+
             self.on_field = False
+
         else:
             self.on_field = True
     
