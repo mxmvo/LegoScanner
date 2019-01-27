@@ -100,5 +100,8 @@ class EnvActionable:
         self.perform_stop_action = self.actionable_object.stop_action_function
         self.perform_reset_action = self.actionable_object.reset_action_function
 
-    def perform_action(self, action_number):
-        self.actionable_object.action_function(self.possible_actions[action_number])
+    def perform_action(self, action):
+        if self.possible_actions:
+            self.actionable_object.action_function(self.possible_actions[action])
+        else:
+            self.actionable_object.action_function(action)

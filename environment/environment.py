@@ -27,8 +27,11 @@ class Environment():
         self.system = System(brick_ip='ev3dev.local', get_state_mode='dict')
         self.field_classifier = utils.load_pickle(field_classifier)
         self.reward_classifier = utils.load_pickle(reward_classifier)
-        self.opposite_action = {0:3,1:2,2:1,3:0}
-        self.opposite_action = {i: self.action_space-i-1 for i in range(self.action_space)}
+
+        try:
+            self.opposite_action = {i: self.action_space-i-1 for i in range(self.action_space)}
+        except:
+            self.opposite_action = None
         
         self.on_field = True
         self.border_count = 0
@@ -71,35 +74,43 @@ class Environment():
             print('I am outside')
             self.border_count += 1
 
-            if ENVIRONMENT_CONFIG['bouncing']:
+            if self.opposite_action and ENVIRONMENT_CONFIG['bouncing']:
                 if self.on_field:
                     self.system.perform_actions([self.opposite_action[a] for a in self.current_action])
                     print('BOUNCIN!!1')
                     time.sleep(1)
 
-            else:
-                self.go_to_unit_state()
+            # else:
+            #     self.go_to_init_state()
 
             self.on_field = False
 
         else:
             self.on_field = True
     
-        if self.border_count == 3:
+        if self.border_count == 2:
             self.go_to_init_state()
             self.border_count = 0
+            return False
+
+        return True
+            
             
     @property
     def _color_state_for_classifier(self):
         return np.array([self._color_from_one_state(s) for s in list(self.state_queue)[-2:]]).reshape(1,-1)
             
-    def _new_reward_approx(self):
+    def _new_reward_approx(self, const_reward=None):
         def transform_proba_into_reward_approx(proba):
             return np.max([0., 5. * (proba - 0.3)])
             
-        # Predict propba
         if not self.on_field:
-            return -10
+            self.reward_queue.append(-10)
+            return
+
+        if const_reward is not None:
+            self.reward_queue.append(const_reward)
+            return 
         
         colors = self._color_state_for_classifier
 #         r = (np.argmax(self.reward_classifier.predict_proba(x), axis = 1) == 1).sum()
@@ -124,10 +135,11 @@ class Environment():
         self._new_state()
         
         # environment specific checks like is it still in the field
-        self._environment_checks()
-        
-        # calculate the reward 
-        self._new_reward_approx()
+        if(self._environment_checks()):
+            # calculate the reward 
+            self._new_reward_approx()
+        else:
+            self._new_reward_approx(-5)
         
     def step(self, action, free_cycles=ENVIRONMENT_CONFIG['free_cycle']):
         self.current_action = action
