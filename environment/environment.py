@@ -64,6 +64,10 @@ class Environment():
     @staticmethod
     def _color_from_one_state(s):
         return s[:3]
+
+    @staticmethod
+    def _position_from_one_state(s):
+        return np.array(s[3:])
         
     def _environment_checks(self):
         # access color information from the last measurement 
@@ -71,7 +75,7 @@ class Environment():
         color = self._color_state_for_classifier
         
         if self.field_classifier.predict(color) == [0]:
-            print('I am outside')
+            print('I am outside', self.border_count)
             self.border_count += 1
 
             if self.opposite_action and ENVIRONMENT_CONFIG['bouncing']:
@@ -86,6 +90,7 @@ class Environment():
             self.on_field = False
 
         else:
+            self.border_count = 0
             self.on_field = True
     
         if self.border_count == 2:
@@ -95,19 +100,16 @@ class Environment():
 
         return True
             
-            
     @property
     def _color_state_for_classifier(self):
         return np.array([self._color_from_one_state(s) for s in list(self.state_queue)[-2:]]).reshape(1,-1)
             
     def _new_reward_approx(self, const_reward=None):
         def transform_proba_into_reward_approx(proba):
-            return np.max([0., 5. * (proba - 0.3)])
-            
-        if not self.on_field:
-            self.reward_queue.append(-10)
-            return
-
+            # return np.max([0., 5. * (proba - 0.05)])
+            return proba
+        
+        # give constant reward if passed from cycle
         if const_reward is not None:
             self.reward_queue.append(const_reward)
             return 
@@ -139,18 +141,25 @@ class Environment():
             # calculate the reward 
             self._new_reward_approx()
         else:
-            self._new_reward_approx(-5)
+            self._new_reward_approx(-1)
+            return False
+
+        return True
         
     def step(self, action, free_cycles=ENVIRONMENT_CONFIG['free_cycle']):
         self.current_action = action
-        self._cycle(False)  
+        if not (self._cycle(False)):
+            return self.state, self.reward, True, {}
+
         for _ in range(free_cycles):
-            self._cycle(True)
+            if not (self._cycle(True)):
+                return self.state, self.reward, True, {}
+
         return self.state, self.reward, False, {}
     
     @property
     def reward(self):
-        return self.get_reward_function(self.reward_queue)
+        return self.get_reward_function(self.state_queue, self.reward_queue)
         
     @property
     def state(self):
