@@ -1,13 +1,13 @@
 import numpy as np
 from .lego_connector import LegoConnector
 from .devices import Device
-from .config import ENVIRONMENT_CONFIG, DEVICES_CONFIG, OBJECTS_CONFIG, SENSORS_CONFIG, ACTIONABLES_CONFIG
+from .config import SYSTEM_CONFIG, DEVICES_CONFIG, OBJECTS_CONFIG, SENSORS_CONFIG, ACTIONABLES_CONFIG
 
 class System:
     def __init__(self, brick_ip='ev3dev.local', get_state_mode=None):
 
         if get_state_mode is None: # fallback to default if not specified
-            self.get_state_mode = ENVIRONMENT_CONFIG.get_state_mode
+            self.get_state_mode = SYSTEM_CONFIG.get_state_mode
         else:
             self.get_state_mode = get_state_mode
 

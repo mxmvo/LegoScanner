@@ -1,6 +1,6 @@
 from .devices import TankMotor, LargeMotor
 
-ENVIRONMENT_CONFIG = {
+SYSTEM_CONFIG = {
     'get_state_mode': 'dict' # list or dict
 }
 
@@ -35,4 +35,8 @@ ACTIONABLES_CONFIG = {
     'large_motor': (lambda device_object: LargeMotor(device_object), [-14, -12, -10, -8, 8, 10, 12, 14], 0),
     #'large_motor.bot': (lambda device_object: LargeMotor(device_object), [-20,-10,10,20], (0,0))
 
+}
+
+ENVIRONMENT_CONFIG ={
+    'free_cycle' : 5
 }
